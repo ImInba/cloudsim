@@ -43,19 +43,21 @@ public class frame2 extends javax.swing.JFrame {
     public static Statement str;
     public static ArrayList<Integer> mipslist = new ArrayList<Integer>();
 
-    public frame2() {
+    public frame2() throws SQLException{
         initComponents();
         jTextField1.setText("");
+        Statement st = con.createStatement();
         try {
             Class.forName("com.mysql.jdbc.Driver");
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mydb", "root", "root");
-            Statement st = con.createStatement();
             st.executeUpdate("create table datacenter(dcname varchar(50),cperbw double,cpermem double, cpermi double, cpersec double,cperstrg double,Mips int(100),mips1Pe int(100),nofPe int(10), nofHost int(10), federation varchar(100))");
             st.executeUpdate("create table dchost(dcname varchar(50),nofHost int(20),hostid int(20), ram int(20), bw int(20), status varchar(100)) ");
             //"No.of Machines", "HostId", "No.of PhyicalMachine", "RAM", "BW"};
             st.executeUpdate("create table datacenterhost(dcname varchar(50),nofHost int(20),hostid int(20), ram int(20), bw int(20), status varchar(100)) ");
             //"No.of Machines", "HostId", "No.of PhyicalMachine", "RAM", "BW"};
         } catch (Exception e) {
+            st.execute("delete from dchost");
+            st.execute("delete from datacenter");
             //e.printStackTrace();
         }
     }
@@ -280,8 +282,8 @@ public class frame2 extends javax.swing.JFrame {
             Class.forName("com.mysql.jdbc.Driver");
             Connection con = (Connection) (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/mydb", "root", "root");
             Statement st = con.createStatement();
-            st.execute("delete from datacenterhost");
-            st.execute("delete from dchost");
+            //st.execute("delete from datacenterhost");
+            //st.execute("delete from dchost");
 
             for (int i = 0; i < nMachines; i++) {
                 nRam = r.nextInt(4);
@@ -376,7 +378,12 @@ public class frame2 extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                try{
                 new frame2().setVisible(true);
+                }
+                catch(Exception e){
+                    
+                }
             }
         });
     }

@@ -199,24 +199,21 @@ public class frame8 extends javax.swing.JFrame {
                 int brid;
                 int fs;
                 String prty;
-     
             Statement st=con.createStatement();
             ResultSet rsy=st.executeQuery("select * from cloudlet order by value Asc");
             while(rsy.next())
             {
-                int flag=0;
+                   int flag=0;
                    jid=rsy.getInt(1);
                    brid=rsy.getInt(2);
                    fs=rsy.getInt(4);
-                   
                    prty=rsy.getString(6);
                    System.out.println(jid+"\t"+brid+"\t"+fs+"\t"+prty);
                    jTextArea1.append("Job ID: "+jid+" Allocated Broker "+brid+" JobSize is "+fs+" With Priority "+prty+"\n");
                    int id; int capbw; String pl; String stat;
                        Statement st2=con.createStatement();
                         ResultSet rst=st2.executeQuery("select * from vtable where brokerid='"+brid+"'");
-                        while(rst.next())
-                        {
+                        while(rst.next()){
                             id=rst.getInt(1);
                              pl=rst.getString(6);
                             stat=rst.getString(7);
@@ -257,8 +254,6 @@ public class frame8 extends javax.swing.JFrame {
                                 str.executeUpdate("update cloudlet set allotedvm='"+v+"' where id='"+jid+"'");
                             jTextArea1.append(jid+ "is not Placed, VMs not Available with required Resources\n\n");
                         }
-                   
-                   
             }
         }
         catch(Exception e)

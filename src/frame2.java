@@ -43,21 +43,26 @@ public class frame2 extends javax.swing.JFrame {
     public static Statement str;
     public static ArrayList<Integer> mipslist = new ArrayList<Integer>();
 
-    public frame2() throws SQLException{
+    public frame2(){
         initComponents();
         jTextField1.setText("");
-        Statement st = con.createStatement();
         try {
             Class.forName("com.mysql.jdbc.Driver");
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mydb", "root", "root");
+            Statement st = con.createStatement();
             st.executeUpdate("create table datacenter(dcname varchar(50),cperbw double,cpermem double, cpermi double, cpersec double,cperstrg double,Mips int(100),mips1Pe int(100),nofPe int(10), nofHost int(10), federation varchar(100))");
             st.executeUpdate("create table dchost(dcname varchar(50),nofHost int(20),hostid int(20), ram int(20), bw int(20), status varchar(100)) ");
             //"No.of Machines", "HostId", "No.of PhyicalMachine", "RAM", "BW"};
             st.executeUpdate("create table datacenterhost(dcname varchar(50),nofHost int(20),hostid int(20), ram int(20), bw int(20), status varchar(100)) ");
             //"No.of Machines", "HostId", "No.of PhyicalMachine", "RAM", "BW"};
         } catch (Exception e) {
+            try{
+            Statement st = con.createStatement();
             st.execute("delete from dchost");
             st.execute("delete from datacenter");
+            }
+            catch(Exception e1){
+            }
             //e.printStackTrace();
         }
     }
@@ -378,12 +383,7 @@ public class frame2 extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                try{
                 new frame2().setVisible(true);
-                }
-                catch(Exception e){
-                    
-                }
             }
         });
     }

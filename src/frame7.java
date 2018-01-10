@@ -155,10 +155,11 @@ public class frame7 extends javax.swing.JFrame {
             System.out.println(fg);
             System.out.println(dlist);
             System.out.println(dloadlist);*/
-           ResultSet rs1 = St1.executeQuery("select hostid,ram,bw from dchost");
+           ResultSet rs1 = St1.executeQuery("select hostid,ram,bw,dcname from dchost");
            ArrayList<Integer> hostidlist = new ArrayList<>();
            ArrayList<Integer> hostramlist = new ArrayList<>();
            ArrayList<Integer> hostbwlist = new ArrayList<>();
+           ArrayList<String> dcname = new ArrayList<>();
            while(rs1.next()){
                int hostid = rs1.getInt(1);
                hostidlist.add(hostid);
@@ -166,6 +167,7 @@ public class frame7 extends javax.swing.JFrame {
                hostramlist.add(hostram);
                int hostbw = rs1.getInt(3);
                hostbwlist.add(hostbw);
+               dcname.add(rs1.getString(4));
            }
             //Loading Virtual machines
             ArrayList<String> vmidlist = new ArrayList<>();
@@ -210,13 +212,22 @@ public class frame7 extends javax.swing.JFrame {
                 if(allocHost!=-1){
                     int ram = hostramlist.get(allocHost)-vmramlist.get(i);
                     int bw = hostbwlist.get(allocHost)-vmbwlist.get(i);
+                    rs1 = St1.executeQuery("select status from dchost where dcname='"+dcname.get(allocHost)+"' and hostid='"+hostidlist.get(allocHost)+"'");
+                    String stat = " vm "+vmidlist.get(i)+" placed";
+                    if(rs1.next()){
+                        String prev = rs1.getString(1);
+                        if(prev.equals("*"))
+                            prev = "";
+                        stat = prev+stat;
+                    }
                     hostramlist.set(allocHost,ram);
                     hostbwlist.set(allocHost,bw);
                     Statement stmt = con.createStatement();
                     stmt.executeUpdate("insert into placement values('" + vmidlist.get(i) + "','" + vmramlist.get(i) + "','" + hostidlist.get(allocHost)+ "','" + hostidlist.get(allocHost) + "')");
+                    stmt.executeUpdate("update vtable set placed ='" + dcname.get(allocHost) + "',status='ready' where vmid='" + vmidlist.get(i) + "'");
+                    stmt.executeUpdate("update dchost set ram='" + ram + "'  , status= '" + stat + "'   where dcname='" + dcname.get(allocHost) + "'and hostid='" + hostidlist.get(allocHost) + "'");
                     jTextArea1.append(vmidlist.get(i) + "\t" + vmramlist.get(i) + "\t" + hostidlist.get(allocHost) + "\t" + hostidlist.get(allocHost) + "\n\n");
                 }
-            
                 /*for (int j = 0; j < dloadlist.size(); j++) {
                     
                     if (vmramlist.get(i) < dloadlist.get(j) || vmramlist.get(i) == dloadlist.get(j)) {
@@ -263,7 +274,7 @@ public class frame7 extends javax.swing.JFrame {
                         break;
                     }
                 } */
-
+//
             }
         System.out.println("final load" + dloadlist);
         } catch (Exception e) {
